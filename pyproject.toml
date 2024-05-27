@@ -1,0 +1,53 @@
+[build-system]
+requires = [
+  'setuptools',
+]
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'pytest-boto-mock'
+description = 'Thin-wrapper around the mock package for easier use with pytest'
+authors = [
+    {name = 'H1Gdev', email = 'h1g.z.ouroboros+github@gmail.com'},
+]
+dependencies = [
+    'botocore',
+    'pytest>=8.2.0',
+    'pytest-mock',
+]
+dynamic = ['version']
+requires-python = '>=3.9'
+readme = 'README.md'
+license = {file = 'LICENSE'}
+keywords = ['pytest', 'botocore', 'pytest-mock']
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Framework :: Pytest',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Topic :: Software Development :: Testing',
+]
+
+[project.urls]
+Homepage = 'https://github.com/H1Gdev/pytest-boto-mock/'
+Source = 'https://github.com/H1Gdev/pytest-boto-mock/'
+Tracker = 'https://github.com/H1Gdev/pytest-boto-mock/issues'
+
+[project.optional-dependencies]
+dev = [
+    'boto3',
+    'tox',
+]
+
+[project.entry-points.pytest11]
+pytest_boto_mock = 'pytest_boto_mock'
+
+[tool.setuptools.package-data]
+pytest_boto_mock = ['py.typed']
