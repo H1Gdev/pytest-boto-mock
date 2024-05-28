@@ -64,6 +64,7 @@ def test_lambda_exception(boto_mocker, expected):
 @pytest.mark.parametrize('expected', [
     # lambda_handler return value format.
     {'statusCode': 200, 'body': json.dumps('Hello from Lambda!')},
+    '',
 ])
 def test_lambda_invoke_value(boto_mocker, expected):
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
@@ -78,7 +79,9 @@ def test_lambda_invoke_value(boto_mocker, expected):
     }))
 
     response = boto3.client('lambda').invoke(FunctionName='FunctionName')
-    actual = json.loads(response.get('Payload').read())
+    actual = response.get('Payload').read().decode()
+    if actual:
+        actual = json.loads(actual)
     assert expected == actual
 
 

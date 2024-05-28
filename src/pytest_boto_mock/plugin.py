@@ -44,7 +44,9 @@ class BotoMockerFixture:
                         payload = {'errorMessage': str(payload), 'errorType': type(payload).__name__}
                     else:
                         raise payload
-                payload = json.dumps(payload).encode()
+                if payload:
+                    payload = json.dumps(payload)
+                payload = payload.encode()
                 return response | {
                     'Payload': botocore.response.StreamingBody(io.BytesIO(payload), len(payload))
                 }
