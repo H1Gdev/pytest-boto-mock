@@ -88,9 +88,65 @@ def test_lambda_invoke_value(boto_mocker, expected):
 
 
 @pytest.mark.parametrize('expected', [
+    # lambda_handler return value format.
+    {'statusCode': 200, 'body': json.dumps('Hello from Lambda!')},
+    '',
+])
+def test_lambda_invoke_callable(boto_mocker, expected):
+    def callable(self, operation_name, kwarg):
+        return {
+            'StatusCode': 200,
+            'Payload': expected,
+        }
+
+    boto_mocker.patch(new=boto_mocker.build_make_api_call({
+        'lambda': {
+            'Invoke': boto_mocker.build_lambda_invoke_handler({
+                'FunctionName': callable,
+            })
+        }
+    }))
+
+    response = boto3.client('lambda').invoke(FunctionName='FunctionName')
+    assert response.get('StatusCode') == 200
+    actual = response.get('Payload').read().decode()
+    if actual:
+        actual = json.loads(actual)
+    assert expected == actual
+
+
+@pytest.mark.parametrize('expected', [
+    # lambda_handler return value format.
+    {'statusCode': 200, 'body': json.dumps('Hello from Lambda!')},
+    '',
+])
+def test_lambda_invoke_payload_callable(boto_mocker, expected):
+    def callable(self, operation_name, kwarg):
+        return expected
+
+    boto_mocker.patch(new=boto_mocker.build_make_api_call({
+        'lambda': {
+            'Invoke': boto_mocker.build_lambda_invoke_handler({
+                'FunctionName': {
+                    'StatusCode': 200,
+                    'Payload': callable,
+                }
+            })
+        }
+    }))
+
+    response = boto3.client('lambda').invoke(FunctionName='FunctionName')
+    assert response.get('StatusCode') == 200
+    actual = response.get('Payload').read().decode()
+    if actual:
+        actual = json.loads(actual)
+    assert expected == actual
+
+
+@pytest.mark.parametrize('expected', [
     botocore.exceptions.ClientError({}, 'Invoke'),
 ])
-def test_lambda_invoke_exception(boto_mocker, expected):
+def test_lambda_invoke_payload_exception(boto_mocker, expected):
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
         'lambda': {
             'Invoke': boto_mocker.build_lambda_invoke_handler({

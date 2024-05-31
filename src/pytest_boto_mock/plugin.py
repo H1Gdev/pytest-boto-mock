@@ -38,12 +38,18 @@ class BotoMockerFixture:
 
             response = response_table.get(function_name)
             if response is not None:
+                if callable(response):
+                    response = response(self, operation_name, kwarg)
+
                 payload = response.get('Payload')
                 if isinstance(payload, Exception):
                     if 'FunctionError' in response:
                         payload = {'errorMessage': str(payload), 'errorType': type(payload).__name__}
                     else:
                         raise payload
+                elif callable(payload):
+                    payload = payload(self, operation_name, kwarg)
+
                 if payload:
                     payload = json.dumps(payload)
                 payload = payload.encode()
