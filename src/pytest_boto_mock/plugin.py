@@ -61,9 +61,49 @@ class BotoMockerFixture:
         return handle_lambda_invoke
 
 
+def _mocker(scope='function'):
+    def _function(mocker):
+        """
+        Return a mocker for Boto. Life cycle is the same as `mocker`.
+        """
+        return BotoMockerFixture(mocker)
+
+    def _class(class_mocker):
+        """
+        Return a mocker for Boto. Life cycle is the same as `class_mocker`.
+        """
+        return BotoMockerFixture(class_mocker)
+
+    def _module(module_mocker):
+        """
+        Return a mocker for Boto. Life cycle is the same as `module_mocker`.
+        """
+        return BotoMockerFixture(module_mocker)
+
+    def _package(package_mocker):
+        """
+        Return a mocker for Boto. Life cycle is the same as `package_mocker`.
+        """
+        return BotoMockerFixture(package_mocker)
+
+    def _session(session_mocker):
+        """
+        Return a mocker for Boto. Life cycle is the same as `session_mocker`.
+        """
+        return BotoMockerFixture(session_mocker)
+
+    return {
+        'function': _function,
+        'class': _class,
+        'module': _module,
+        'package': _package,
+        'session': _session,
+    }[scope]
+
+
 # For all scopes.
-boto_mocker = pytest.fixture()(lambda mocker: BotoMockerFixture(mocker))
-class_boto_mocker = pytest.fixture(scope='class')(lambda class_mocker: BotoMockerFixture(class_mocker))
-module_boto_mocker = pytest.fixture(scope='module')(lambda module_mocker: BotoMockerFixture(module_mocker))
-package_boto_mocker = pytest.fixture(scope='package')(lambda package_mocker: BotoMockerFixture(package_mocker))
-session_boto_mocker = pytest.fixture(scope='session')(lambda session_mocker: BotoMockerFixture(session_mocker))
+boto_mocker = pytest.fixture()(_mocker())
+class_boto_mocker = pytest.fixture(scope='class')(_mocker('class'))
+module_boto_mocker = pytest.fixture(scope='module')(_mocker('module'))
+package_boto_mocker = pytest.fixture(scope='package')(_mocker('package'))
+session_boto_mocker = pytest.fixture(scope='session')(_mocker('session'))

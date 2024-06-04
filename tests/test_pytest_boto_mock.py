@@ -298,6 +298,9 @@ def test_s3_resource(boto_mocker, count):
 # SQS
 @pytest.fixture
 def setup_sqs(boto_mocker):
+    """
+    Setup Amazon SQS client.
+    """
     message_list = {}
 
     def send_message(self, operation_name, kwarg):
