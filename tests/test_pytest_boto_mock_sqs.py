@@ -48,24 +48,34 @@ def setup_sqs(boto_mocker):
 
         nonlocal message_list
         message_list[queue_url] = [message for message in message_list[queue_url] if message['ReceiptHandle'] != receipt_handle]
-        ret = {
+        return {
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
-        return ret
+
+    def get_queue_url(self, operation_name, kwarg):
+        queue_name = kwarg['QueueName']
+        queue_owner_aws_account_id = kwarg.get('QueueOwnerAWSAccountId', 'ACCOUNT_ID')
+        return {
+            'QueueUrl': f"https://sqs.REGION.amazonaws.com/{queue_owner_aws_account_id}/{queue_name}",
+            'ResponseMetadata': {'HTTPStatusCode': 200},
+        }
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
         'sqs': {
             'SendMessage': send_message,
             'ReceiveMessage': receive_message,
             'DeleteMessage': delete_message,
+            'GetQueueUrl': get_queue_url,
         },
     }))
 
 
 def test_sqs_sequence(setup_sqs):
-    queue_url = 'https://sqs.REGION.amazonaws.com/ACCOUNT_ID/QueueName.fifo'
+    queue_name = 'QueueName.fifo'
 
     sqs = boto3.client('sqs')
+    response = sqs.get_queue_url(QueueName=queue_name)
+    queue_url = response['QueueUrl']
     response = sqs.send_message(QueueUrl=queue_url, MessageBody='Body', MessageGroupId='GroupId', MessageDeduplicationId='DeduplicationId')
     response = sqs.receive_message(QueueUrl=queue_url)
     receipt_handle = response['Messages'][0]['ReceiptHandle']
