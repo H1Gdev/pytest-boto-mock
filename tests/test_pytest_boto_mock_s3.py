@@ -1,3 +1,6 @@
+import io
+import json
+
 import boto3
 import botocore.exceptions
 import pytest
@@ -92,3 +95,64 @@ def test_s3_resource(boto_mocker, count):
     }))
 
     boto3.resource('s3').Bucket('bucket').objects.filter(Prefix='test').delete()
+
+
+@pytest.fixture
+def setup_read_json(boto_mocker):
+    def get_object(self, operation_name, kwarg):
+        key = kwarg.get('Key')
+        if key == 'not_exist.json':
+            client = boto3.client('s3')
+            raise client.exceptions.NoSuchKey({}, 'GetObject')
+        else:
+            body = json.dumps({
+                'key': key,
+            }).encode()
+            return {
+                'ResponseMetadata': {'HTTPStatusCode': 200},
+                'Body': botocore.response.StreamingBody(io.BytesIO(body), len(body)),
+            }
+
+    boto_mocker.patch(new=boto_mocker.build_make_api_call({
+        's3': {
+            'GetObject': get_object,
+        },
+    }))
+
+
+@pytest.mark.parametrize('key, has', [
+    ('test.json', True),
+    ('not_exist.json', False),
+])
+def test_s3_client_read_json(setup_read_json, key, has):
+    client = boto3.client('s3')
+    try:
+        response = client.get_object(Bucket='bucket', Key=key)
+        body = response.get('Body').read()
+        json_data = json.loads(body)
+    except client.exceptions.NoSuchKey:
+        json_data = None
+
+    if has:
+        assert json_data is not None
+    else:
+        assert json_data is None
+
+
+@pytest.mark.parametrize('key, has', [
+    ('test.json', True),
+    ('not_exist.json', False),
+])
+def test_s3_resource_read_json(setup_read_json, key, has):
+    resource = boto3.resource('s3')
+    try:
+        response = resource.Bucket('bucket').Object(key).get()
+        body = response.get('Body').read()
+        json_data = json.loads(body)
+    except resource.meta.client.exceptions.NoSuchKey:
+        json_data = None
+
+    if has:
+        assert json_data is not None
+    else:
+        assert json_data is None
