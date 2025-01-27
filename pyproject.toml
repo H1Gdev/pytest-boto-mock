@@ -55,3 +55,17 @@ pytest_boto_mock = ['py.typed']
 
 [tool.setuptools_scm]
 write_to = 'src/pytest_boto_mock/_version.py'
+
+[tool.ruff]
+line-length = 180
+
+[tool.ruff.lint]
+extend-select = ['I', 'N']
+
+[tool.ruff.lint.isort]
+force-single-line = true
+known-third-party = ['pytest_boto_mock']
+lines-after-imports = 2
+single-line-exclusions = [
+    'typing',
+]
