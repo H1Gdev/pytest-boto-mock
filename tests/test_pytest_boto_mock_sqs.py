@@ -19,7 +19,6 @@ def setup_sqs(boto_mocker):
             'ReceiptHandle': str(uuid.uuid4()),
         }
 
-        nonlocal message_list
         if queue_url in message_list:
             message_list[queue_url].append(message)
         else:
@@ -33,7 +32,6 @@ def setup_sqs(boto_mocker):
         queue_url = kwarg['QueueUrl']
         max_number_of_messages = kwarg.get('MaxNumberOfMessages', 1)
 
-        nonlocal message_list
         ret = {
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
@@ -46,7 +44,6 @@ def setup_sqs(boto_mocker):
         queue_url = kwarg['QueueUrl']
         receipt_handle = kwarg['ReceiptHandle']
 
-        nonlocal message_list
         message_list[queue_url] = [message for message in message_list[queue_url] if message['ReceiptHandle'] != receipt_handle]
         return {
             'ResponseMetadata': {'HTTPStatusCode': 200},

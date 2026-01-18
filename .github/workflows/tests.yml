@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build and Check Package
-        uses: hynek/build-and-inspect-python-package@v2.6.0
+        uses: hynek/build-and-inspect-python-package@v2.14.0
         with:
           attest-build-provenance-github: true
   tests:
@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.9", "3.10", "3.11", "3.12"]
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         os: [ubuntu-latest, windows-latest]
         tox_env: [py]
         include:
