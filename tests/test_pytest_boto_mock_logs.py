@@ -13,21 +13,21 @@ def setup_logs(boto_mocker):
     logs = boto3.client('logs')
     log_groups = {}
 
-    def create_log_group(self, operation_name, kwarg):
+    def _create_log_group(self, operation_name, kwarg):
         log_group_name = kwarg['logGroupName']
         if log_group_name in log_groups:
             raise logs.exceptions.ResourceAlreadyExistsException({}, 'CreateLogGroup')
         log_groups[log_group_name] = {}
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def delete_log_group(self, operation_name, kwarg):
+    def _delete_log_group(self, operation_name, kwarg):
         log_group_name = kwarg['logGroupName']
         if log_group_name not in log_groups:
             raise logs.exceptions.ResourceNotFoundException({}, 'DeleteLogGroup')
         del log_groups[log_group_name]
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def create_log_stream(self, operation_name, kwarg):
+    def _create_log_stream(self, operation_name, kwarg):
         log_group_name = kwarg['logGroupName']
         log_stream_name = kwarg['logStreamName']
         if log_group_name not in log_groups:
@@ -38,7 +38,7 @@ def setup_logs(boto_mocker):
         log_group[log_stream_name] = {}
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def delete_log_stream(self, operation_name, kwarg):
+    def _delete_log_stream(self, operation_name, kwarg):
         log_group_name = kwarg['logGroupName']
         log_stream_name = kwarg['logStreamName']
         if log_group_name not in log_groups:
@@ -49,7 +49,7 @@ def setup_logs(boto_mocker):
         del log_group[log_stream_name]
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def put_log_events(self, operation_name, kwarg):
+    def _put_log_events(self, operation_name, kwarg):
         log_group_name = kwarg['logGroupName']
         log_stream_name = kwarg['logStreamName']
         log_events = kwarg['logEvents']
@@ -68,11 +68,11 @@ def setup_logs(boto_mocker):
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
         'cloudwatchlogs': {
-            'CreateLogGroup': create_log_group,
-            'DeleteLogGroup': delete_log_group,
-            'CreateLogStream': create_log_stream,
-            'DeleteLogStream': delete_log_stream,
-            'PutLogEvents': put_log_events,
+            'CreateLogGroup': _create_log_group,
+            'DeleteLogGroup': _delete_log_group,
+            'CreateLogStream': _create_log_stream,
+            'DeleteLogStream': _delete_log_stream,
+            'PutLogEvents': _put_log_events,
         },
     }))
 

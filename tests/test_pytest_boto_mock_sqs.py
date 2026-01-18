@@ -12,7 +12,7 @@ def setup_sqs(boto_mocker):
     """
     message_list = {}
 
-    def send_message(self, operation_name, kwarg):
+    def _send_message(self, operation_name, kwarg):
         queue_url = kwarg['QueueUrl']
         message = {
             'Body': kwarg['MessageBody'],
@@ -29,7 +29,7 @@ def setup_sqs(boto_mocker):
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
 
-    def receive_message(self, operation_name, kwarg):
+    def _receive_message(self, operation_name, kwarg):
         queue_url = kwarg['QueueUrl']
         max_number_of_messages = kwarg.get('MaxNumberOfMessages', 1)
 
@@ -42,7 +42,7 @@ def setup_sqs(boto_mocker):
             ret['Messages'] = messages
         return ret
 
-    def delete_message(self, operation_name, kwarg):
+    def _delete_message(self, operation_name, kwarg):
         queue_url = kwarg['QueueUrl']
         receipt_handle = kwarg['ReceiptHandle']
 
@@ -52,7 +52,7 @@ def setup_sqs(boto_mocker):
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
 
-    def get_queue_url(self, operation_name, kwarg):
+    def _get_queue_url(self, operation_name, kwarg):
         queue_name = kwarg['QueueName']
         queue_owner_aws_account_id = kwarg.get('QueueOwnerAWSAccountId', 'ACCOUNT_ID')
         return {
@@ -62,10 +62,10 @@ def setup_sqs(boto_mocker):
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
         'sqs': {
-            'SendMessage': send_message,
-            'ReceiveMessage': receive_message,
-            'DeleteMessage': delete_message,
-            'GetQueueUrl': get_queue_url,
+            'SendMessage': _send_message,
+            'ReceiveMessage': _receive_message,
+            'DeleteMessage': _delete_message,
+            'GetQueueUrl': _get_queue_url,
         },
     }))
 

@@ -36,11 +36,11 @@ def test_lambda_value(boto_mocker, expected):
     {'StatusCode': 200, 'Payload': json.dumps({}).encode()},
 ])
 def test_lambda_callable(boto_mocker, expected):
-    def callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, kwarg):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
-        'lambda': {'Invoke': callable}
+        'lambda': {'Invoke': _callable}
     }))
 
     actual = boto3.client('lambda').invoke(FunctionName='FunctionName')
@@ -92,7 +92,7 @@ def test_lambda_invoke_value(boto_mocker, expected):
     '',
 ])
 def test_lambda_invoke_callable(boto_mocker, expected):
-    def callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, kwarg):
         return {
             'StatusCode': 200,
             'Payload': expected,
@@ -101,7 +101,7 @@ def test_lambda_invoke_callable(boto_mocker, expected):
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
         'lambda': {
             'Invoke': boto_mocker.build_lambda_invoke_handler({
-                'FunctionName': callable,
+                'FunctionName': _callable,
             })
         }
     }))
@@ -120,7 +120,7 @@ def test_lambda_invoke_callable(boto_mocker, expected):
     '',
 ])
 def test_lambda_invoke_payload_callable(boto_mocker, expected):
-    def callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, kwarg):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
@@ -128,7 +128,7 @@ def test_lambda_invoke_payload_callable(boto_mocker, expected):
             'Invoke': boto_mocker.build_lambda_invoke_handler({
                 'FunctionName': {
                     'StatusCode': 200,
-                    'Payload': callable,
+                    'Payload': _callable,
                 }
             })
         }

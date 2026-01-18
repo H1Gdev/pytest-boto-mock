@@ -37,11 +37,11 @@ def test_s3_value(boto_mocker, expected):
     {'ResponseMetadata': {'HTTPStatusCode': 200}},
 ])
 def test_s3_callable(boto_mocker, expected):
-    def callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, kwarg):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
-        's3': {'CopyObject': callable}
+        's3': {'CopyObject': _callable}
     }))
 
     actual = boto3.client('s3').copy_object(Bucket='bucket')
@@ -67,7 +67,7 @@ def test_s3_exception(boto_mocker, expected):
     2,
 ])
 def test_s3_resource(boto_mocker, count):
-    def list_objects(self, operation_name, kwarg):
+    def _list_objects(self, operation_name, kwarg):
         ret = {
             'ResponseMetadata': {'HTTPStatusCode': 200},
             'IsTruncated': False,
@@ -79,7 +79,7 @@ def test_s3_resource(boto_mocker, count):
             ret['Contents'] = [{'Key': f"test_{i}.txt"} for i in range(count)]
         return ret
 
-    def delete_objects(self, operation_name, kwarg):
+    def _delete_objects(self, operation_name, kwarg):
         ret = {
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
@@ -89,8 +89,8 @@ def test_s3_resource(boto_mocker, count):
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
         's3': {
-            'ListObjects': list_objects,
-            'DeleteObjects': delete_objects,
+            'ListObjects': _list_objects,
+            'DeleteObjects': _delete_objects,
         },
     }))
 
@@ -99,7 +99,7 @@ def test_s3_resource(boto_mocker, count):
 
 @pytest.fixture
 def setup_read_json(boto_mocker):
-    def get_object(self, operation_name, kwarg):
+    def _get_object(self, operation_name, kwarg):
         key = kwarg.get('Key')
         if key == 'not_exist.json':
             client = boto3.client('s3')
@@ -115,7 +115,7 @@ def setup_read_json(boto_mocker):
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
         's3': {
-            'GetObject': get_object,
+            'GetObject': _get_object,
         },
     }))
 
