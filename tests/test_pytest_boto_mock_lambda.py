@@ -22,7 +22,7 @@ def test_lambda_call_native(boto_mocker):
 ])
 def test_lambda_value(boto_mocker, expected):
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
-        'lambda': {'Invoke': expected}
+        'lambda': {'Invoke': expected},
     }))
 
     actual = boto3.client('lambda').invoke(FunctionName='FunctionName')
@@ -40,7 +40,7 @@ def test_lambda_callable(boto_mocker, expected):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
-        'lambda': {'Invoke': _callable}
+        'lambda': {'Invoke': _callable},
     }))
 
     actual = boto3.client('lambda').invoke(FunctionName='FunctionName')
@@ -53,7 +53,7 @@ def test_lambda_callable(boto_mocker, expected):
 ])
 def test_lambda_exception(boto_mocker, expected):
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
-        'lambda': {'Invoke': expected}
+        'lambda': {'Invoke': expected},
     }))
 
     with pytest.raises(Exception) as ex:
@@ -73,9 +73,9 @@ def test_lambda_invoke_value(boto_mocker, expected):
                 'FunctionName': {
                     'StatusCode': 200,
                     'Payload': expected,
-                }
-            })
-        }
+                },
+            }),
+        },
     }))
 
     response = boto3.client('lambda').invoke(FunctionName='FunctionName')
@@ -102,8 +102,8 @@ def test_lambda_invoke_callable(boto_mocker, expected):
         'lambda': {
             'Invoke': boto_mocker.build_lambda_invoke_handler({
                 'FunctionName': _callable,
-            })
-        }
+            }),
+        },
     }))
 
     response = boto3.client('lambda').invoke(FunctionName='FunctionName')
@@ -129,9 +129,9 @@ def test_lambda_invoke_payload_callable(boto_mocker, expected):
                 'FunctionName': {
                     'StatusCode': 200,
                     'Payload': _callable,
-                }
-            })
-        }
+                },
+            }),
+        },
     }))
 
     response = boto3.client('lambda').invoke(FunctionName='FunctionName')
@@ -152,9 +152,9 @@ def test_lambda_invoke_payload_exception(boto_mocker, expected):
                 'FunctionName': {
                     'StatusCode': 200,
                     'Payload': expected,
-                }
-            })
-        }
+                },
+            }),
+        },
     }))
 
     with pytest.raises(Exception) as ex:
@@ -173,9 +173,9 @@ def test_lambda_invoke_function_error(boto_mocker, expected):
                     'StatusCode': 200,
                     'FunctionError': 'Unhandled',
                     'Payload': expected,
-                }
-            })
-        }
+                },
+            }),
+        },
     }))
 
     response = boto3.client('lambda').invoke(FunctionName='FunctionName')
@@ -193,9 +193,9 @@ def test_lambda_invoke_event(boto_mocker):
                     'ResponseMetadata': {'HTTPStatusCode': 202},
                     'StatusCode': 202,
                     'Payload': '',
-                }
-            })
-        }
+                },
+            }),
+        },
     }))
 
     response = boto3.client('lambda').invoke(FunctionName='FunctionName', InvocationType='Event')

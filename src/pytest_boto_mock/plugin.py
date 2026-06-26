@@ -54,7 +54,7 @@ class BotoMockerFixture:
                     payload = json.dumps(payload)
                 payload = payload.encode()
                 return response | {
-                    'Payload': botocore.response.StreamingBody(io.BytesIO(payload), len(payload))
+                    'Payload': botocore.response.StreamingBody(io.BytesIO(payload), len(payload)),
                 }
             return BotoMockerFixture._make_api_call(self, operation_name, kwarg)
 

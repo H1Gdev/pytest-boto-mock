@@ -53,7 +53,7 @@ def setup_sqs(boto_mocker):
         queue_name = kwarg['QueueName']
         queue_owner_aws_account_id = kwarg.get('QueueOwnerAWSAccountId', 'ACCOUNT_ID')
         return {
-            'QueueUrl': f"https://sqs.REGION.amazonaws.com/{queue_owner_aws_account_id}/{queue_name}",
+            'QueueUrl': f'https://sqs.REGION.amazonaws.com/{queue_owner_aws_account_id}/{queue_name}',
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
 

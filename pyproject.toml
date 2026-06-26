@@ -62,12 +62,17 @@ line-length = 180
 
 [tool.ruff.lint]
 extend-select = [
+    'COM',
     'E',
     'F',
     'I',
     'N',
+    'Q',
     'W',
 ]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = 'single'
 
 [tool.ruff.lint.isort]
 force-single-line = true

@@ -23,7 +23,7 @@ def test_s3_call_native(boto_mocker):
 ])
 def test_s3_value(boto_mocker, expected):
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
-        's3': {'CopyObject': expected}
+        's3': {'CopyObject': expected},
     }))
 
     actual = boto3.client('s3').copy_object(Bucket='bucket')
@@ -41,7 +41,7 @@ def test_s3_callable(boto_mocker, expected):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
-        's3': {'CopyObject': _callable}
+        's3': {'CopyObject': _callable},
     }))
 
     actual = boto3.client('s3').copy_object(Bucket='bucket')
@@ -76,7 +76,7 @@ def test_s3_resource(boto_mocker, count):
             'MaxKeys': 1000,
         }
         if count:
-            ret['Contents'] = [{'Key': f"test_{i}.txt"} for i in range(count)]
+            ret['Contents'] = [{'Key': f'test_{i}.txt'} for i in range(count)]
         return ret
 
     def _delete_objects(self, operation_name, kwarg):
@@ -84,7 +84,7 @@ def test_s3_resource(boto_mocker, count):
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
         if count:
-            ret['Deleted'] = [{'Key': f"test_{i}.txt"} for i in range(count)]
+            ret['Deleted'] = [{'Key': f'test_{i}.txt'} for i in range(count)]
         return ret
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
