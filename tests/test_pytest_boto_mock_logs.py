@@ -13,23 +13,23 @@ def setup_logs(boto_mocker):
     logs = boto3.client('logs')
     log_groups = {}
 
-    def _create_log_group(self, operation_name, kwarg):
-        log_group_name = kwarg['logGroupName']
+    def _create_log_group(self, operation_name, api_params):
+        log_group_name = api_params['logGroupName']
         if log_group_name in log_groups:
             raise logs.exceptions.ResourceAlreadyExistsException({}, 'CreateLogGroup')
         log_groups[log_group_name] = {}
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def _delete_log_group(self, operation_name, kwarg):
-        log_group_name = kwarg['logGroupName']
+    def _delete_log_group(self, operation_name, api_params):
+        log_group_name = api_params['logGroupName']
         if log_group_name not in log_groups:
             raise logs.exceptions.ResourceNotFoundException({}, 'DeleteLogGroup')
         del log_groups[log_group_name]
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def _create_log_stream(self, operation_name, kwarg):
-        log_group_name = kwarg['logGroupName']
-        log_stream_name = kwarg['logStreamName']
+    def _create_log_stream(self, operation_name, api_params):
+        log_group_name = api_params['logGroupName']
+        log_stream_name = api_params['logStreamName']
         if log_group_name not in log_groups:
             raise logs.exceptions.ResourceNotFoundException({}, 'CreateLogStream')
         log_group = log_groups[log_group_name]
@@ -38,9 +38,9 @@ def setup_logs(boto_mocker):
         log_group[log_stream_name] = {}
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def _delete_log_stream(self, operation_name, kwarg):
-        log_group_name = kwarg['logGroupName']
-        log_stream_name = kwarg['logStreamName']
+    def _delete_log_stream(self, operation_name, api_params):
+        log_group_name = api_params['logGroupName']
+        log_stream_name = api_params['logStreamName']
         if log_group_name not in log_groups:
             raise logs.exceptions.ResourceNotFoundException({}, 'DeleteLogStream')
         log_group = log_groups[log_group_name]
@@ -49,10 +49,10 @@ def setup_logs(boto_mocker):
         del log_group[log_stream_name]
         return {'ResponseMetadata': {'HTTPStatusCode': 200}}
 
-    def _put_log_events(self, operation_name, kwarg):
-        log_group_name = kwarg['logGroupName']
-        log_stream_name = kwarg['logStreamName']
-        log_events = kwarg['logEvents']
+    def _put_log_events(self, operation_name, api_params):
+        log_group_name = api_params['logGroupName']
+        log_stream_name = api_params['logStreamName']
+        log_events = api_params['logEvents']
         if log_group_name not in log_groups:
             raise logs.exceptions.ResourceNotFoundException({}, 'PutLogEvents')
         log_group = log_groups[log_group_name]

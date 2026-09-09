@@ -12,10 +12,10 @@ def setup_sqs(boto_mocker):
     """
     message_list = {}
 
-    def _send_message(self, operation_name, kwarg):
-        queue_url = kwarg['QueueUrl']
+    def _send_message(self, operation_name, api_params):
+        queue_url = api_params['QueueUrl']
         message = {
-            'Body': kwarg['MessageBody'],
+            'Body': api_params['MessageBody'],
             'ReceiptHandle': str(uuid.uuid4()),
         }
 
@@ -28,9 +28,9 @@ def setup_sqs(boto_mocker):
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
 
-    def _receive_message(self, operation_name, kwarg):
-        queue_url = kwarg['QueueUrl']
-        max_number_of_messages = kwarg.get('MaxNumberOfMessages', 1)
+    def _receive_message(self, operation_name, api_params):
+        queue_url = api_params['QueueUrl']
+        max_number_of_messages = api_params.get('MaxNumberOfMessages', 1)
 
         ret = {
             'ResponseMetadata': {'HTTPStatusCode': 200},
@@ -40,18 +40,18 @@ def setup_sqs(boto_mocker):
             ret['Messages'] = messages
         return ret
 
-    def _delete_message(self, operation_name, kwarg):
-        queue_url = kwarg['QueueUrl']
-        receipt_handle = kwarg['ReceiptHandle']
+    def _delete_message(self, operation_name, api_params):
+        queue_url = api_params['QueueUrl']
+        receipt_handle = api_params['ReceiptHandle']
 
         message_list[queue_url] = [message for message in message_list[queue_url] if message['ReceiptHandle'] != receipt_handle]
         return {
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
 
-    def _get_queue_url(self, operation_name, kwarg):
-        queue_name = kwarg['QueueName']
-        queue_owner_aws_account_id = kwarg.get('QueueOwnerAWSAccountId', 'ACCOUNT_ID')
+    def _get_queue_url(self, operation_name, api_params):
+        queue_name = api_params['QueueName']
+        queue_owner_aws_account_id = api_params.get('QueueOwnerAWSAccountId', 'ACCOUNT_ID')
         return {
             'QueueUrl': f'https://sqs.REGION.amazonaws.com/{queue_owner_aws_account_id}/{queue_name}',
             'ResponseMetadata': {'HTTPStatusCode': 200},

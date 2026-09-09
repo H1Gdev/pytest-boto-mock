@@ -37,7 +37,7 @@ def test_s3_value(boto_mocker, expected):
     {'ResponseMetadata': {'HTTPStatusCode': 200}},
 ])
 def test_s3_callable(boto_mocker, expected):
-    def _callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, api_params):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
@@ -67,7 +67,7 @@ def test_s3_exception(boto_mocker, expected):
     2,
 ])
 def test_s3_resource(boto_mocker, count):
-    def _list_objects(self, operation_name, kwarg):
+    def _list_objects(self, operation_name, api_params):
         ret = {
             'ResponseMetadata': {'HTTPStatusCode': 200},
             'IsTruncated': False,
@@ -79,7 +79,7 @@ def test_s3_resource(boto_mocker, count):
             ret['Contents'] = [{'Key': f'test_{i}.txt'} for i in range(count)]
         return ret
 
-    def _delete_objects(self, operation_name, kwarg):
+    def _delete_objects(self, operation_name, api_params):
         ret = {
             'ResponseMetadata': {'HTTPStatusCode': 200},
         }
@@ -99,8 +99,8 @@ def test_s3_resource(boto_mocker, count):
 
 @pytest.fixture
 def setup_read_json(boto_mocker):
-    def _get_object(self, operation_name, kwarg):
-        key = kwarg.get('Key')
+    def _get_object(self, operation_name, api_params):
+        key = api_params.get('Key')
         if key == 'not_exist.json':
             client = boto3.client('s3')
             raise client.exceptions.NoSuchKey({}, 'GetObject')

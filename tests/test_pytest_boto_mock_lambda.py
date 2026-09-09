@@ -36,7 +36,7 @@ def test_lambda_value(boto_mocker, expected):
     {'StatusCode': 200, 'Payload': json.dumps({}).encode()},
 ])
 def test_lambda_callable(boto_mocker, expected):
-    def _callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, api_params):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({
@@ -92,7 +92,7 @@ def test_lambda_invoke_value(boto_mocker, expected):
     '',
 ])
 def test_lambda_invoke_callable(boto_mocker, expected):
-    def _callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, api_params):
         return {
             'StatusCode': 200,
             'Payload': expected,
@@ -120,7 +120,7 @@ def test_lambda_invoke_callable(boto_mocker, expected):
     '',
 ])
 def test_lambda_invoke_payload_callable(boto_mocker, expected):
-    def _callable(self, operation_name, kwarg):
+    def _callable(self, operation_name, api_params):
         return expected
 
     boto_mocker.patch(new=boto_mocker.build_make_api_call({

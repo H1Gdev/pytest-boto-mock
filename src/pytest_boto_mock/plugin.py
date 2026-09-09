@@ -18,7 +18,7 @@ class BotoMockerFixture:
 
     @staticmethod
     def build_make_api_call(service_table):
-        def make_api_call(self, operation_name, kwarg):
+        def make_api_call(self, operation_name, api_params):
             service_name = type(self).__name__.lower()
 
             operation_table = service_table.get(service_name)
@@ -26,20 +26,20 @@ class BotoMockerFixture:
                 operation = operation_table.get(operation_name)
                 if isinstance(operation, Exception):
                     raise operation
-                return operation(self, operation_name, kwarg) if callable(operation) else operation
-            return BotoMockerFixture._make_api_call(self, operation_name, kwarg)
+                return operation(self, operation_name, api_params) if callable(operation) else operation
+            return BotoMockerFixture._make_api_call(self, operation_name, api_params)
 
         return make_api_call
 
     @staticmethod
     def build_lambda_invoke_handler(response_table):
-        def handle_lambda_invoke(self, operation_name, kwarg):
-            function_name = kwarg.get('FunctionName')
+        def handle_lambda_invoke(self, operation_name, api_params):
+            function_name = api_params.get('FunctionName')
 
             response = response_table.get(function_name)
             if response is not None:
                 if callable(response):
-                    response = response(self, operation_name, kwarg)
+                    response = response(self, operation_name, api_params)
 
                 payload = response.get('Payload')
                 if isinstance(payload, Exception):
@@ -48,7 +48,7 @@ class BotoMockerFixture:
                     else:
                         raise payload
                 elif callable(payload):
-                    payload = payload(self, operation_name, kwarg)
+                    payload = payload(self, operation_name, api_params)
 
                 if payload:
                     payload = json.dumps(payload)
@@ -56,7 +56,7 @@ class BotoMockerFixture:
                 return response | {
                     'Payload': botocore.response.StreamingBody(io.BytesIO(payload), len(payload)),
                 }
-            return BotoMockerFixture._make_api_call(self, operation_name, kwarg)
+            return BotoMockerFixture._make_api_call(self, operation_name, api_params)
 
         return handle_lambda_invoke
 
